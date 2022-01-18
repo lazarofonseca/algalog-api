@@ -19,24 +19,23 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.algaworks.algalog.domain.model.Cliente;
 import com.algaworks.algalog.domain.repository.ClienteRepository;
+import com.algaworks.algalog.domain.service.CatalogoClienteService;
 
 @RestController
 @RequestMapping("/clientes")
 public class ClienteController {
 
-	// UMA MANEIRA DE FAZER ACESSO AO BANCO COM ENTITYMANAGER PARA PROJETOS PEQUENO
-	// TESTES E ESTUDOS
-	// @PersistenceContext
-	// private EntityManager manager;
 	@Autowired
 	private ClienteRepository clienteRepository;
+	
+	@Autowired
+	private CatalogoClienteService catalogoClienteService;
 
 	@GetMapping
 	public List<Cliente> listar() {
 
 		return clienteRepository.findAll();
 
-		// return manager.createQuery("from Cliente", Cliente.class).getResultList();
 	}
 
 	@GetMapping("/{id}")
@@ -49,7 +48,7 @@ public class ClienteController {
 	@PostMapping
 	@ResponseStatus(code = HttpStatus.CREATED)
 	public Cliente adicionar(@Valid @RequestBody Cliente cliente) {
-		return clienteRepository.save(cliente);
+		return catalogoClienteService.salvar(cliente);
 	}
 
 	@PutMapping("/{id}")
@@ -59,7 +58,7 @@ public class ClienteController {
 		}
 
 		cliente.setId(id);
-		cliente = clienteRepository.save(cliente);
+		cliente = catalogoClienteService.salvar(cliente);
 		return ResponseEntity.ok(cliente);
 
 	}
@@ -70,7 +69,7 @@ public class ClienteController {
 			return ResponseEntity.notFound().build();
 		}
 
-		clienteRepository.deleteById(id);
+		catalogoClienteService.excluir(id);
 
 		return ResponseEntity.noContent().build();
 
